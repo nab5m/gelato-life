@@ -6,8 +6,11 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  // 런타임: 풀링 연결(Supabase 6543, pgbouncer). 미설정 시 DATABASE_URL 그대로 사용.
+  url       = env("DATABASE_URL")
+  // 마이그레이션: 직결(Supabase 5432). 로컬 docker 처럼 풀링이 없으면 DATABASE_URL 과 동일하게 둔다.
+  directUrl = env("DIRECT_URL")
 }
 
 /// B — 플라트라이프 계약 원본 미러. plottContractId 기준 upsert.
