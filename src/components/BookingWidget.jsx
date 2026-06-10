@@ -3,7 +3,8 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Minus, Plus } from "lucide-react";
-import { krw, nightsBetween } from "@/lib/format";
+import { krw } from "@/lib/format";
+import { computeContractPrice } from "@/lib/partner/contractPricing";
 
 export default function BookingWidget({ listing }) {
   const router = useRouter();
@@ -11,11 +12,22 @@ export default function BookingWidget({ listing }) {
   const [checkOut, setCheckOut] = useState("");
   const [guests, setGuests] = useState(2);
 
-  const nights = nightsBetween(checkIn, checkOut);
-  const base = nights * listing.price;
-  const service = Math.round(base * listing.serviceFeeRate);
-  const total = base + (nights ? listing.cleaningFee : 0) + service;
-  const valid = nights > 0;
+  // 실제 계약 금액과 동일한 플라트라이프 공식으로 견적 계산
+  const price = useMemo(
+    () =>
+      computeContractPrice({
+        rentFeePerWeek: listing.price,
+        managementFeePerWeek: listing.managementFeePerWeek,
+        cleaningFee: listing.cleaningFee,
+        deposit: listing.deposit,
+        discountRules: listing.discountRules,
+        depositRules: listing.depositRules,
+        startDate: checkIn,
+        endDate: checkOut,
+      }),
+    [listing, checkIn, checkOut]
+  );
+  const valid = price.days > 0;
 
   const reserve = () => {
     const params = new URLSearchParams({
@@ -105,16 +117,21 @@ export default function BookingWidget({ listing }) {
             아직 예약 확정 전이에요
           </p>
           <div className="mt-4 space-y-3 text-sm text-gray-700">
-            <Row
-              label={`${krw(listing.price)} × ${nights}박`}
-              value={krw(base)}
-            />
-            <Row label="청소비" value={krw(listing.cleaningFee)} />
-            <Row label="젤라또 서비스 수수료" value={krw(service)} />
+            <Row label={`임대료 (${price.days}일)`} value={krw(price.totalRentFee)} />
+            {price.discountedRentFee > 0 && (
+              <Row label="기간 할인" value={`- ${krw(price.discountedRentFee)}`} />
+            )}
+            <Row label="관리비" value={krw(price.totalManagementFee)} />
+            <Row label="청소비" value={krw(price.cleaningFee)} />
+            <Row label="서비스 수수료" value={krw(price.commissionFee)} />
+            <Row label="보증금" value={krw(price.deposit)} />
             <div className="border-t border-gray-200 pt-3">
-              <Row label="총 합계" value={krw(total)} bold />
+              <Row label="총 예상 금액" value={krw(price.totalPrice)} bold />
             </div>
           </div>
+          <p className="mt-2 text-center text-xs text-gray-400">
+            최종 금액은 계약 시 플라트라이프 기준으로 확정됩니다.
+          </p>
         </>
       )}
     </div>
