@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search, Minus, Plus } from "lucide-react";
+import DateRangePicker from "@/components/DateRangePicker";
 
 export default function SearchBar({
   variant = "hero",
@@ -28,8 +29,6 @@ export default function SearchBar({
     router.push(`/search?${params.toString()}`);
   };
 
-  const today = "2025-06-09";
-
   return (
     <form
       onSubmit={submit}
@@ -52,32 +51,20 @@ export default function SearchBar({
         </div>
         <div className="hidden h-8 w-px bg-gray-200 md:block" />
 
-        {/* 체크인 */}
-        <div className="flex-1 rounded-2xl px-5 py-2.5 transition hover:bg-gray-50 md:rounded-full">
+        {/* 날짜 */}
+        <div className="flex-1 rounded-2xl px-5 py-2 transition hover:bg-gray-50 md:rounded-full">
           <label className="block text-xs font-semibold text-gray-800">
-            체크인
+            날짜
           </label>
-          <input
-            type="date"
-            min={today}
-            value={checkIn}
-            onChange={(e) => setCheckIn(e.target.value)}
-            className="w-full bg-transparent text-sm text-gray-600 outline-none"
-          />
-        </div>
-        <div className="hidden h-8 w-px bg-gray-200 md:block" />
-
-        {/* 체크아웃 */}
-        <div className="flex-1 rounded-2xl px-5 py-2.5 transition hover:bg-gray-50 md:rounded-full">
-          <label className="block text-xs font-semibold text-gray-800">
-            체크아웃
-          </label>
-          <input
-            type="date"
-            min={checkIn || today}
-            value={checkOut}
-            onChange={(e) => setCheckOut(e.target.value)}
-            className="w-full bg-transparent text-sm text-gray-600 outline-none"
+          <DateRangePicker
+            checkIn={checkIn}
+            checkOut={checkOut}
+            onChange={(ci, co) => {
+              setCheckIn(ci);
+              setCheckOut(co);
+            }}
+            showIcon={false}
+            triggerClassName="w-full bg-transparent text-left text-sm text-gray-600 outline-none"
           />
         </div>
         <div className="hidden h-8 w-px bg-gray-200 md:block" />

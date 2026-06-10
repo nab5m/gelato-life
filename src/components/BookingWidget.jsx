@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Minus, Plus } from "lucide-react";
 import { krw } from "@/lib/format";
 import { computeContractPrice } from "@/lib/partner/contractPricing";
+import DateRangePicker from "@/components/DateRangePicker";
 
 export default function BookingWidget({ listing }) {
   const router = useRouter();
@@ -38,8 +39,6 @@ export default function BookingWidget({ listing }) {
     router.push(`/checkout/${listing.id}?${params.toString()}`);
   };
 
-  const today = "2025-06-09";
-
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-card">
       <div className="flex items-end justify-between">
@@ -49,34 +48,16 @@ export default function BookingWidget({ listing }) {
         </p>
       </div>
 
-      <div className="mt-4 overflow-hidden rounded-xl border border-gray-300">
-        <div className="grid grid-cols-2">
-          <label className="border-r border-gray-300 p-3">
-            <span className="block text-[11px] font-bold uppercase text-gray-700">
-              체크인
-            </span>
-            <input
-              type="date"
-              min={today}
-              value={checkIn}
-              onChange={(e) => setCheckIn(e.target.value)}
-              className="w-full bg-transparent text-sm outline-none"
-            />
-          </label>
-          <label className="p-3">
-            <span className="block text-[11px] font-bold uppercase text-gray-700">
-              체크아웃
-            </span>
-            <input
-              type="date"
-              min={checkIn || today}
-              value={checkOut}
-              onChange={(e) => setCheckOut(e.target.value)}
-              className="w-full bg-transparent text-sm outline-none"
-            />
-          </label>
-        </div>
-        <div className="flex items-center justify-between border-t border-gray-300 p-3">
+      <div className="mt-4 space-y-2">
+        <DateRangePicker
+          checkIn={checkIn}
+          checkOut={checkOut}
+          onChange={(ci, co) => {
+            setCheckIn(ci);
+            setCheckOut(co);
+          }}
+        />
+        <div className="flex items-center justify-between rounded-xl border border-gray-300 p-3">
           <div>
             <span className="block text-[11px] font-bold uppercase text-gray-700">
               인원

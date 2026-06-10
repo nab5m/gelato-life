@@ -50,3 +50,43 @@ body {
     scrollbar-width: none;
   }
 }
+
+/* 날짜 선택 캘린더(react-day-picker) — 젤라또 톤 */
+/* 변수는 .rdp-root 에 정의돼 있어, 같은 요소를 더 높은 명시도로 덮어써야 한다 */
+.gl-cal .rdp-root {
+  --rdp-accent-color: #f93f86;
+  --rdp-accent-background-color: #ffe4ee;
+  --rdp-range_start-background: #f93f86;
+  --rdp-range_end-background: #f93f86;
+  --rdp-range_start-date-background-color: #f93f86;
+  --rdp-range_end-date-background-color: #f93f86;
+  --rdp-range_start-color: #ffffff;
+  --rdp-range_end-color: #ffffff;
+  --rdp-range_middle-background-color: #ffe4ee;
+  --rdp-range_middle-color: #c1115a;
+  --rdp-today-color: #e51f6e;
+  --rdp-selected-border: 2px solid #f93f86;
+  --rdp-day-width: 2.25rem;
+  --rdp-day-height: 2.25rem;
+  --rdp-day_button-width: 2.25rem;
+  --rdp-day_button-height: 2.25rem;
+  --rdp-day_button-border-radius: 9999px;
+  --rdp-font-family: inherit;
+}
+/* 월 이동 화살표(chevron) 색상 */
+.gl-cal .rdp-chevron {
+  fill: #f93f86;
+}
+.gl-cal .rdp-month_caption {
+  font-weight: 700;
+  color: #111827;
+  font-size: 0.95rem;
+}
+.gl-cal .rdp-weekday {
+  color: #9ca3af;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+.gl-cal .rdp-day_button:hover {
+  background: #fff1f6;
+}
