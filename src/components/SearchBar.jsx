@@ -4,12 +4,18 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search, Minus, Plus } from "lucide-react";
 
-export default function SearchBar({ variant = "hero" }) {
+export default function SearchBar({
+  variant = "hero",
+  initialWhere = "",
+  initialCheckIn = "",
+  initialCheckOut = "",
+  initialGuests = 1,
+}) {
   const router = useRouter();
-  const [where, setWhere] = useState("");
-  const [checkIn, setCheckIn] = useState("");
-  const [checkOut, setCheckOut] = useState("");
-  const [guests, setGuests] = useState(1);
+  const [where, setWhere] = useState(initialWhere);
+  const [checkIn, setCheckIn] = useState(initialCheckIn);
+  const [checkOut, setCheckOut] = useState(initialCheckOut);
+  const [guests, setGuests] = useState(initialGuests || 1);
   const [openGuests, setOpenGuests] = useState(false);
 
   const submit = (e) => {

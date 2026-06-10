@@ -50,7 +50,14 @@ function SearchInner() {
 
       <div className="border-b border-gray-100 bg-white py-4">
         <div className="mx-auto max-w-7xl px-4 md:px-6">
-          <SearchBar variant="compact" />
+          <SearchBar
+            key={`${q}|${startDate}|${endDate}|${guests || ""}`}
+            variant="compact"
+            initialWhere={q}
+            initialCheckIn={startDate}
+            initialCheckOut={endDate}
+            initialGuests={Number(guests) || 1}
+          />
         </div>
       </div>
 

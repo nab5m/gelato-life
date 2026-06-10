@@ -102,21 +102,6 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className="my-6 flex items-center gap-3 text-xs text-gray-400">
-          <span className="h-px flex-1 bg-gray-200" />
-          또는
-          <span className="h-px flex-1 bg-gray-200" />
-        </div>
-
-        <div className="space-y-2.5">
-          <button className="btn-outline w-full">
-            <span className="text-lg">🇬</span> Google로 계속하기
-          </button>
-          <button className="btn-outline w-full">
-            <span className="text-lg">🍎</span> Apple로 계속하기
-          </button>
-        </div>
-
         <p className="mt-6 text-center text-sm text-gray-600">
           아직 회원이 아니신가요?{" "}
           <Link href="/signup" className="font-semibold text-gelato-600 hover:underline">

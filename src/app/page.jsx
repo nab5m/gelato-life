@@ -1,17 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SearchBar from "@/components/SearchBar";
-import CategoryBar from "@/components/CategoryBar";
 import ListingCard from "@/components/ListingCard";
 import { useRooms, useInfiniteScroll } from "@/lib/roomsClient";
 
 export default function HomePage() {
-  const [category, setCategory] = useState("all");
   const { rooms: filtered, loading, loadingMore, error, hasMore, loadMore } =
-    useRooms({ category });
+    useRooms();
   const sentinelRef = useInfiniteScroll(loadMore, hasMore && !loading && !error);
 
   return (
@@ -42,12 +39,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 카테고리 + 그리드 */}
+      {/* 숙소 그리드 */}
       <main className="mx-auto max-w-7xl px-4 md:px-6">
-        <div className="sticky top-[61px] z-30 -mx-4 border-b border-gray-100 bg-white/95 px-4 backdrop-blur md:-mx-6 md:px-6">
-          <CategoryBar active={category} onChange={setCategory} />
-        </div>
-
         <div className="grid grid-cols-1 gap-x-5 gap-y-8 py-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filtered.map((l) => (
             <ListingCard key={l.id} listing={l} />
@@ -76,7 +69,7 @@ export default function HomePage() {
 
         {!loading && !error && filtered.length === 0 && (
           <p className="py-20 text-center text-gray-500">
-            해당 카테고리의 숙소가 아직 없어요. 다른 카테고리를 골라보세요!
+            등록된 숙소가 아직 없어요.
           </p>
         )}
       </main>
