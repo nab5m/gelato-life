@@ -1,0 +1,14 @@
+/node_modules
+/.next
+/out
+/build
+.DS_Store
+*.pem
+npm-debug.log*
+
+# env: 모든 .env* 무시하되, 커밋 대상인 .env(로컬 기본값)와 예시 파일만 예외
+.env*
+!.env
+!.env.local.example
+
+.vercel

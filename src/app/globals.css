@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: "Pretendard", "Apple SD Gothic Neo", "Helvetica Neue", Arial,
+    sans-serif;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  background: #ffffff;
+  color: #222222;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* 스크롤바 살짝 다듬기 */
+::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #e7e7e7;
+  border-radius: 8px;
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-gelato-500 to-gelato-600 px-5 py-3 font-semibold text-white shadow-soft transition hover:opacity-95 active:scale-[0.99] disabled:opacity-50;
+  }
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 px-5 py-3 font-semibold text-gray-800 transition hover:border-gray-800;
+  }
+  .input {
+    @apply w-full rounded-xl border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-gelato-500 focus:ring-2 focus:ring-gelato-100;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

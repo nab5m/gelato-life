@@ -1,0 +1,95 @@
+// 플라트라이프 계약 연동 스키마 (2-테이블 구조)
+//  - PlottLifeContract (B): 플라트라이프 계약 원본 미러 (읽기 전용 기준점)
+//  - Reservation       (A): 변환된 자사 예약 도메인 모델
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// B — 플라트라이프 계약 원본 미러. plottContractId 기준 upsert.
+model PlottLifeContract {
+  /// 플라트라이프 계약 식별자 (응답의 id). 연결 키.
+  plottContractId BigInt   @id
+  /// 우리가 부여한 계약 식별자 (응답의 externalId)
+  externalId      String?  @unique
+  /// 계약 번호 (no)
+  no              String?
+  /// 플라트라이프 계약 상태 (contractStatus) — 원본 문자열 그대로
+  status          String
+  /// 응답 전체 원본 JSON (변환 재생성/정합성 대조용)
+  raw             Json
+  /// 플라트라이프 기준 수정 시각 (updatedAt)
+  plottUpdatedAt  DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  reservation     Reservation?
+}
+
+/// A — 자사 예약 도메인. 계약 시점 정보는 스냅샷으로 박고, 상태만 갱신.
+model Reservation {
+  id               String   @id @default(cuid())
+  /// B 와 연결되는 FK (플라트라이프 계약 id)
+  plottContractId  BigInt   @unique
+  /// 우리 계약 externalId (멱등 생성/조회용)
+  externalId       String   @unique
+
+  /// 예약한 유저 (우리 서비스 로그인 유저). webhook 으로 들어온 외부 계약은 null.
+  userId           String?
+  user             User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  /// 방(buildingUnitType) 식별자 — 파트너
+  buildingUnitTypeId       BigInt?
+  buildingUnitTypeExternalId String?
+  /// 표시용 방 정보 스냅샷
+  roomTitle        String?
+  roomCity         String?
+  roomThumb        String?
+  roomLat          Float?
+  roomLng          Float?
+
+  /// 입주자 정보
+  guestName        String?
+  guestEmail       String?
+  guestPhone       String?
+
+  /// 계약 기간 (UTC)
+  startAt          DateTime
+  endAt            DateTime
+
+  /// 금액 스냅샷 (KRW 정수)
+  currency         String   @default("KRW")
+  deposit          Int      @default(0)
+  rentFeePerWeek   Int      @default(0)
+  totalRentFee     Int      @default(0)
+  discountedRentFee Int     @default(0)
+  cleaningFee      Int      @default(0)
+  managementFeePerWeek Int  @default(0)
+  totalManagementFee Int    @default(0)
+  totalPrice       Int      @default(0)
+
+  /// 도메인 예약 상태 (플라트라이프 contractStatus 를 매핑)
+  status           String
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  mirror           PlottLifeContract @relation(fields: [plottContractId], references: [plottContractId], onDelete: Cascade)
+}
+
+/// 서비스 로그인 유저
+model User {
+  id           String        @id @default(cuid())
+  email        String        @unique
+  /// scrypt 해시 ("salt:hash")
+  passwordHash String
+  name         String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  reservations Reservation[]
+}

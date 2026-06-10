@@ -1,0 +1,18 @@
+# 로컬 개발용 PostgreSQL. 계약 연동(플라트라이프) 데이터 저장에 사용한다.
+#   docker compose up -d
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: gelato-life-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: gelato
+      POSTGRES_PASSWORD: gelato
+      POSTGRES_DB: gelato_life
+    ports:
+      - "5432:5432"
+    volumes:
+      - gelato_pgdata:/var/lib/postgresql/data
+
+volumes:
+  gelato_pgdata:
