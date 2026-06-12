@@ -10,6 +10,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BookingWidget from "@/components/BookingWidget";
 import { useRoom } from "@/lib/roomsClient";
+import { useFavorites } from "@/context/FavoritesContext";
+import { useT } from "@/context/LocaleContext";
 
 const AMENITY_ICON = {
   "무선 인터넷": Wifi,
@@ -21,14 +23,16 @@ const AMENITY_ICON = {
 };
 
 export default function RoomPage() {
+  const t = useT();
   const { id } = useParams();
   const { room: listing, loading, error } = useRoom(id);
+  const { isFavorited, toggle } = useFavorites();
 
   if (loading) {
     return (
       <div className="min-h-screen bg-white">
         <Header />
-        <p className="py-32 text-center text-gray-400">숙소 정보를 불러오는 중…</p>
+        <p className="py-32 text-center text-gray-400">{t("숙소 정보를 불러오는 중…")}</p>
         <Footer />
       </div>
     );
@@ -41,13 +45,13 @@ export default function RoomPage() {
         <div className="py-32 text-center">
           <p className="text-4xl">🍨</p>
           <p className="mt-3 font-semibold text-gray-800">
-            숙소를 찾을 수 없어요
+            {t("숙소를 찾을 수 없어요")}
           </p>
           <Link
             href="/search"
             className="mt-4 inline-block text-sm font-semibold text-gelato-600 underline"
           >
-            검색으로 돌아가기
+            {t("검색으로 돌아가기")}
           </Link>
         </div>
         <Footer />
@@ -67,24 +71,31 @@ export default function RoomPage() {
           href="/search"
           className="mb-3 inline-flex items-center gap-1 text-sm font-semibold text-gray-700 hover:underline"
         >
-          <ChevronLeft size={16} /> 검색으로 돌아가기
+          <ChevronLeft size={16} /> {t("검색으로 돌아가기")}
         </Link>
 
         <div className="flex flex-wrap items-end justify-between gap-3">
           <h1 className="text-2xl font-bold text-gray-900">{listing.title}</h1>
           <div className="flex items-center gap-4 text-sm">
             <button className="flex items-center gap-1.5 font-semibold underline">
-              <Share size={16} /> 공유하기
+              <Share size={16} /> {t("공유하기")}
             </button>
-            <button className="flex items-center gap-1.5 font-semibold underline">
-              <Heart size={16} /> 저장
+            <button
+              onClick={() => toggle(listing)}
+              className="flex items-center gap-1.5 font-semibold underline"
+            >
+              <Heart
+                size={16}
+                className={isFavorited(listing.id) ? "fill-gelato-500 text-gelato-500" : ""}
+              />{" "}
+              {isFavorited(listing.id) ? t("저장됨") : t("저장")}
             </button>
           </div>
         </div>
         <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-gray-700">
           {listing.superhost && (
             <span className="flex items-center gap-1 font-semibold">
-              <Award size={14} className="text-gelato-500" /> 슈퍼호스트 ·
+              <Award size={14} className="text-gelato-500" /> {t("슈퍼호스트")} ·
             </span>
           )}
           <span className="flex items-center gap-1 underline">
@@ -108,7 +119,7 @@ export default function RoomPage() {
           </div>
         ) : (
           <div className="mt-5 flex h-[300px] items-center justify-center rounded-2xl bg-gray-100 text-gray-400 md:h-[440px]">
-            등록된 이미지가 없습니다
+            {t("등록된 이미지가 없습니다")}
           </div>
         )}
 
@@ -118,11 +129,10 @@ export default function RoomPage() {
             <div className="flex items-center justify-between border-b border-gray-200 pb-6">
               <div>
                 <h2 className="text-xl font-bold text-gray-900">
-                  {listing.host.name}님이 호스팅하는 {listing.type}
+                  {t("{name}님이 호스팅하는 {type}", { name: listing.host.name, type: listing.type })}
                 </h2>
                 <p className="mt-1 text-gray-600">
-                  최대 인원 {listing.guests}명 · 침실 {listing.beds}개 · 침대{" "}
-                  {listing.beds}개 · 욕실 {listing.baths}개
+                  {t("최대 인원 {guests}명 · 침실 {beds}개 · 침대 {beds}개 · 욕실 {baths}개", { guests: listing.guests, beds: listing.beds, baths: listing.baths })}
                 </p>
               </div>
               <img
@@ -136,18 +146,18 @@ export default function RoomPage() {
             <div className="space-y-4 border-b border-gray-200 py-6">
               <Highlight
                 icon={Award}
-                title="슈퍼호스트"
-                desc={`${listing.host.name}님은 평점이 높고 경험이 풍부한 호스트입니다.`}
+                title={t("슈퍼호스트")}
+                desc={t("{name}님은 평점이 높고 경험이 풍부한 호스트입니다.", { name: listing.host.name })}
               />
               <Highlight
                 icon={MapPin}
-                title="최적의 위치"
-                desc="최근 게스트들이 위치에 별점 5점을 줬어요."
+                title={t("최적의 위치")}
+                desc={t("최근 게스트들이 위치에 별점 5점을 줬어요.")}
               />
               <Highlight
                 icon={Star}
-                title="무료 취소"
-                desc="체크인 5일 전까지 무료로 취소할 수 있어요."
+                title={t("무료 취소")}
+                desc={t("체크인 5일 전까지 무료로 취소할 수 있어요.")}
               />
             </div>
 
@@ -157,7 +167,7 @@ export default function RoomPage() {
 
             {/* 편의시설 */}
             <div className="border-b border-gray-200 py-6">
-              <h3 className="mb-4 text-lg font-bold">숙소 편의시설</h3>
+              <h3 className="mb-4 text-lg font-bold">{t("숙소 편의시설")}</h3>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {listing.amenities.map((a) => {
                   const Icon = AMENITY_ICON[a] || Star;
@@ -173,12 +183,12 @@ export default function RoomPage() {
 
             {/* 요금 정책 (전기/수도/가스/인터넷 포함 여부) */}
             <div className="py-6">
-              <h3 className="mb-4 text-lg font-bold">요금 정책</h3>
+              <h3 className="mb-4 text-lg font-bold">{t("요금 정책")}</h3>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <FeeRow label="전기" included={listing.utilityFees?.electric} />
-                <FeeRow label="수도" included={listing.utilityFees?.water} />
-                <FeeRow label="가스" included={listing.utilityFees?.gas} />
-                <FeeRow label="인터넷" included={listing.utilityFees?.internet} />
+                <FeeRow label={t("전기")} included={listing.utilityFees?.electric} />
+                <FeeRow label={t("수도")} included={listing.utilityFees?.water} />
+                <FeeRow label={t("가스")} included={listing.utilityFees?.gas} />
+                <FeeRow label={t("인터넷")} included={listing.utilityFees?.internet} />
               </div>
             </div>
           </div>
@@ -199,8 +209,9 @@ export default function RoomPage() {
 
 // 요금 포함 여부: true=임대료 포함, false=별도 부과, null/undefined=정보 없음
 function FeeRow({ label, included }) {
+  const t = useT();
   const text =
-    included === true ? "임대료 포함" : included === false ? "별도 부과" : "정보 없음";
+    included === true ? t("임대료 포함") : included === false ? t("별도 부과") : t("정보 없음");
   const tone =
     included === true
       ? "text-mint-600"

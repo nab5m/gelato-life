@@ -91,8 +91,33 @@ model User {
   /// scrypt 해시 ("salt:hash")
   passwordHash String
   name         String?
+  /// 플라트라이프 채팅 유저 식별자 (chatUserId). externalUserId=user.id 로 멱등 생성 후 캐시.
+  chatUserId   BigInt?       @unique
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
   reservations Reservation[]
+  favorites    Favorite[]
+}
+
+/// 찜(좋아요/저장) — 회원이 저장한 매물. (userId, roomId) 당 1건.
+model Favorite {
+  id           String   @id @default(cuid())
+  /// 저장한 유저
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// 파트너 방(building-unit-type) 식별자 = listing.id (문자열)
+  roomId       String
+
+  /// 위시리스트 표시용 스냅샷 (파트너 API 재조회 없이 렌더)
+  roomTitle    String?
+  roomCity     String?
+  roomThumb    String?
+  roomPrice    Int      @default(0)
+  roomCurrency String   @default("KRW")
+
+  createdAt    DateTime @default(now())
+
+  @@unique([userId, roomId])
+  @@index([userId])
 }

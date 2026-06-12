@@ -3,12 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import { Map as MapIcon } from "lucide-react";
 import { loadGoogleMaps } from "@/lib/googleMaps";
+import { useT } from "@/context/LocaleContext";
 
 const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 const SEOUL = { lat: 37.5665, lng: 126.978 };
 
 // 핀 클릭 시 InfoWindow 에 띄울 방 카드 DOM 생성. 카드 클릭 → onSelect(id).
-function buildCard(m, onSelect) {
+function buildCard(m, onSelect, t) {
   const card = document.createElement("div");
   card.style.cssText =
     "width:210px;cursor:pointer;font-family:inherit;line-height:1.3;";
@@ -23,7 +24,7 @@ function buildCard(m, onSelect) {
   }
 
   const title = document.createElement("div");
-  title.textContent = m.title || "이름 없는 숙소";
+  title.textContent = m.title || t("이름 없는 숙소");
   title.style.cssText =
     "margin-top:8px;font-weight:600;font-size:13px;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;";
   card.appendChild(title);
@@ -43,7 +44,7 @@ function buildCard(m, onSelect) {
   }
 
   const cta = document.createElement("div");
-  cta.textContent = "상세 보기 →";
+  cta.textContent = t("상세 보기 →");
   cta.style.cssText = "margin-top:6px;font-size:12px;font-weight:600;color:#f93f86;";
   card.appendChild(cta);
 
@@ -60,6 +61,7 @@ export default function GoogleMap({
   onSelect,
   className = "h-full w-full",
 }) {
+  const t = useT();
   const ref = useRef(null);
   const onSelectRef = useRef(onSelect);
   onSelectRef.current = onSelect;
@@ -95,7 +97,7 @@ export default function GoogleMap({
             title: p.title || undefined,
           });
           marker.addListener("click", () => {
-            info.setContent(buildCard(p, (id) => onSelectRef.current?.(id)));
+            info.setContent(buildCard(p, (id) => onSelectRef.current?.(id), t));
             info.open({ map, anchor: marker });
           });
           bounds.extend({ lat: p.lat, lng: p.lng });
@@ -107,7 +109,7 @@ export default function GoogleMap({
     return () => {
       cancelled = true;
     };
-  }, [center, markers, zoom]);
+  }, [center, markers, zoom, t]);
 
   if (failed) {
     return (
@@ -116,7 +118,7 @@ export default function GoogleMap({
       >
         <MapIcon size={22} />
         <span className="text-sm font-medium">
-          {API_KEY ? "지도를 불러오지 못했어요" : "지도 API 키가 설정되지 않았어요"}
+          {API_KEY ? t("지도를 불러오지 못했어요") : t("지도 API 키가 설정되지 않았어요")}
         </span>
       </div>
     );

@@ -1,8 +1,11 @@
+"use client";
 import Link from "next/link";
 import Header from "./Header";
 import Footer from "./Footer";
+import { useT } from "@/context/LocaleContext";
 
 export default function ComingSoon({ emoji = "🍨", title, desc }) {
+  const t = useT();
   return (
     <div className="flex min-h-screen flex-col bg-white">
       <Header />
@@ -11,7 +14,7 @@ export default function ComingSoon({ emoji = "🍨", title, desc }) {
         <h1 className="mt-5 text-2xl font-bold text-gray-900">{title}</h1>
         <p className="mt-2 max-w-md text-gray-500">{desc}</p>
         <Link href="/" className="btn-primary mt-6">
-          홈으로 돌아가기
+          {t("홈으로 돌아가기")}
         </Link>
       </main>
       <Footer />

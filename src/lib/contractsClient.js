@@ -2,9 +2,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { apiFetch } from "./apiFetch";
 
 export async function createReservation(input) {
-  const res = await fetch("/api/contracts", {
+  const res = await apiFetch("/api/contracts", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(input),
@@ -15,7 +16,7 @@ export async function createReservation(input) {
 }
 
 export async function cancelReservation(id) {
-  const res = await fetch(`/api/contracts/${id}`, {
+  const res = await apiFetch(`/api/contracts/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ action: "cancel" }),
@@ -26,7 +27,7 @@ export async function cancelReservation(id) {
 }
 
 export async function completeReservation(id) {
-  const res = await fetch(`/api/contracts/${id}`, {
+  const res = await apiFetch(`/api/contracts/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ action: "complete" }),
@@ -37,7 +38,7 @@ export async function completeReservation(id) {
 }
 
 export async function fetchReservation(id) {
-  const res = await fetch(`/api/contracts/${id}`);
+  const res = await apiFetch(`/api/contracts/${id}`);
   if (res.status === 404) return null;
   if (!res.ok) throw new Error(`예약 조회 실패 (${res.status})`);
   const json = await res.json();
@@ -45,7 +46,7 @@ export async function fetchReservation(id) {
 }
 
 export async function fetchReservations() {
-  const res = await fetch("/api/contracts");
+  const res = await apiFetch("/api/contracts");
   if (!res.ok) throw new Error(`예약 목록 조회 실패 (${res.status})`);
   const json = await res.json();
   return json.items || [];

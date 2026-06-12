@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
+import { apiFetch } from "@/lib/apiFetch";
 
 const AuthContext = createContext(null);
 
@@ -11,7 +12,7 @@ export function AuthProvider({ children }) {
   // 최초 진입 시 세션 확인
   useEffect(() => {
     let alive = true;
-    fetch("/api/auth/me")
+    apiFetch("/api/auth/me")
       .then((r) => r.json())
       .then((d) => alive && setUser(d.user || null))
       .catch(() => {})
@@ -22,7 +23,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   async function postAuth(path, body) {
-    const res = await fetch(path, {
+    const res = await apiFetch(path, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
@@ -38,7 +39,7 @@ export function AuthProvider({ children }) {
     postAuth("/api/auth/signup", { email, password, name });
 
   const logout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+    await apiFetch("/api/auth/logout", { method: "POST" }).catch(() => {});
     setUser(null);
   };
 

@@ -9,6 +9,7 @@ import {
   serializeReservation,
 } from "@/lib/contracts/service";
 import { getUserIdFromRequest } from "@/lib/auth";
+import { withLocale } from "@/lib/partner/requestContext";
 
 export const dynamic = "force-dynamic";
 
@@ -20,14 +21,14 @@ async function findOwned(id, userId) {
   return resv;
 }
 
-export async function GET(request, { params }) {
+async function handleGET(request, { params }) {
   const userId = getUserIdFromRequest(request);
   const resv = await findOwned(params.id, userId);
   if (!resv) return NextResponse.json({ error: "예약을 찾을 수 없습니다." }, { status: 404 });
   return NextResponse.json({ reservation: serializeReservation(resv) });
 }
 
-export async function PATCH(request, { params }) {
+async function handlePATCH(request, { params }) {
   const { id } = params;
   const userId = getUserIdFromRequest(request);
   const owned = await findOwned(id, userId);
@@ -64,3 +65,6 @@ export async function PATCH(request, { params }) {
     return NextResponse.json({ error: String(e?.message || e) }, { status });
   }
 }
+
+export const GET = withLocale(handleGET);
+export const PATCH = withLocale(handlePATCH);

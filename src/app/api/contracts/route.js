@@ -4,11 +4,12 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getRoom } from "@/lib/partner/rooms";
 import { createReservation, serializeReservation } from "@/lib/contracts/service";
+import { withLocale } from "@/lib/partner/requestContext";
 import { getUserIdFromRequest } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(request) {
+async function handleGET(request) {
   const userId = getUserIdFromRequest(request);
   if (!userId) return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
   const list = await prisma.reservation.findMany({
@@ -18,7 +19,7 @@ export async function GET(request) {
   return NextResponse.json({ items: list.map(serializeReservation) });
 }
 
-export async function POST(request) {
+async function handlePOST(request) {
   const userId = getUserIdFromRequest(request);
   if (!userId) return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
 
@@ -73,3 +74,6 @@ export async function POST(request) {
     return NextResponse.json({ error: String(e?.message || e) }, { status });
   }
 }
+
+export const GET = withLocale(handleGET);
+export const POST = withLocale(handlePOST);

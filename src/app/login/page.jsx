@@ -6,8 +6,10 @@ import { useRouter } from "next/navigation";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import Logo from "@/components/Logo";
 import { useAuth } from "@/context/AuthContext";
+import { useT } from "@/context/LocaleContext";
 
 export default function LoginPage() {
+  const t = useT();
   const { login } = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -22,7 +24,9 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await login({ email, password: pw });
-      router.push("/reservations");
+      // ?next= 가 있으면 그곳으로(앱 내부 경로만 허용), 없으면 예약 목록으로.
+      const next = new URLSearchParams(window.location.search).get("next");
+      router.push(next && next.startsWith("/") ? next : "/reservations");
     } catch (err) {
       setError(String(err.message || err));
     } finally {
@@ -35,16 +39,16 @@ export default function LoginPage() {
       <div className="w-full max-w-md rounded-3xl border border-gray-100 bg-white p-8 shadow-card animate-fade-in">
         <div className="mb-6 flex flex-col items-center text-center">
           <Logo size={44} />
-          <h1 className="mt-4 text-2xl font-bold text-gray-900">다시 오셨네요!</h1>
+          <h1 className="mt-4 text-2xl font-bold text-gray-900">{t("다시 오셨네요!")}</h1>
           <p className="mt-1 text-sm text-gray-500">
-            달콤한 여행을 이어가려면 로그인하세요.
+            {t("달콤한 여행을 이어가려면 로그인하세요.")}
           </p>
         </div>
 
         <form onSubmit={submit} className="space-y-4">
           <div>
             <label className="mb-1.5 block text-sm font-semibold text-gray-700">
-              이메일
+              {t("이메일")}
             </label>
             <div className="relative">
               <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
@@ -61,7 +65,7 @@ export default function LoginPage() {
 
           <div>
             <label className="mb-1.5 block text-sm font-semibold text-gray-700">
-              비밀번호
+              {t("비밀번호")}
             </label>
             <div className="relative">
               <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
@@ -86,10 +90,10 @@ export default function LoginPage() {
           <div className="flex items-center justify-between text-sm">
             <label className="flex items-center gap-2 text-gray-600">
               <input type="checkbox" className="rounded text-gelato-500" />
-              로그인 유지
+              {t("로그인 유지")}
             </label>
             <a href="#" className="font-semibold text-gelato-600 hover:underline">
-              비밀번호 찾기
+              {t("비밀번호 찾기")}
             </a>
           </div>
 
@@ -98,14 +102,14 @@ export default function LoginPage() {
           )}
 
           <button type="submit" disabled={loading} className="btn-primary w-full">
-            {loading ? "로그인 중…" : "로그인"}
+            {loading ? t("로그인 중…") : t("로그인")}
           </button>
         </form>
 
         <p className="mt-6 text-center text-sm text-gray-600">
-          아직 회원이 아니신가요?{" "}
+          {t("아직 회원이 아니신가요?")}{" "}
           <Link href="/signup" className="font-semibold text-gelato-600 hover:underline">
-            회원가입
+            {t("회원가입")}
           </Link>
         </p>
       </div>

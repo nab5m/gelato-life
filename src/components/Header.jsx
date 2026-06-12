@@ -3,13 +3,17 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Menu, Globe, MessageCircle, Search, User } from "lucide-react";
+import { Menu, Globe, MessageCircle, Search, User, Check } from "lucide-react";
 import Logo from "./Logo";
 import { useAuth } from "@/context/AuthContext";
+import { useLocale } from "@/context/LocaleContext";
+import { LOCALES } from "@/lib/i18n/config";
 
 export default function Header({ showSearchPill = true }) {
   const { user, logout } = useAuth();
+  const { locale, setLocale, t } = useLocale();
   const [open, setOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
   const router = useRouter();
 
   return (
@@ -25,11 +29,11 @@ export default function Header({ showSearchPill = true }) {
             onClick={() => router.push("/search")}
             className="hidden items-center gap-3 rounded-full border border-gray-200 bg-white py-2 pl-5 pr-2 text-sm font-medium shadow-soft transition hover:shadow-card md:flex"
           >
-            <span>어디든지</span>
+            <span>{t("어디든지")}</span>
             <span className="h-5 w-px bg-gray-200" />
-            <span>언제든</span>
+            <span>{t("언제든")}</span>
             <span className="h-5 w-px bg-gray-200" />
-            <span className="text-gray-500">게스트 추가</span>
+            <span className="text-gray-500">{t("게스트 추가")}</span>
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-r from-gelato-500 to-gelato-600 text-white">
               <Search size={16} />
             </span>
@@ -42,22 +46,52 @@ export default function Header({ showSearchPill = true }) {
             href="/host"
             className="hidden rounded-full px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-100 lg:block"
           >
-            숙소를 등록하세요
+            {t("숙소를 등록하세요")}
           </Link>
           <Link
             href="/messages"
             className="relative hidden rounded-full p-2.5 text-gray-700 transition hover:bg-gray-100 sm:block"
-            aria-label="메시지"
+            aria-label={t("메시지")}
           >
             <MessageCircle size={20} />
             <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-gelato-500" />
           </Link>
-          <button
-            className="hidden rounded-full p-2.5 text-gray-700 transition hover:bg-gray-100 sm:block"
-            aria-label="언어"
-          >
-            <Globe size={20} />
-          </button>
+
+          {/* 언어 선택 (지구본) */}
+          <div className="relative hidden sm:block">
+            <button
+              onClick={() => setLangOpen((v) => !v)}
+              className="rounded-full p-2.5 text-gray-700 transition hover:bg-gray-100"
+              aria-label={t("언어 선택")}
+            >
+              <Globe size={20} />
+            </button>
+
+            {langOpen && (
+              <>
+                <div className="fixed inset-0 z-30" onClick={() => setLangOpen(false)} />
+                <div className="absolute right-0 top-12 z-40 w-44 overflow-hidden rounded-2xl border border-gray-100 bg-white py-2 shadow-card animate-fade-in">
+                  <p className="px-4 py-1.5 text-xs font-semibold text-gray-400">{t("언어 선택")}</p>
+                  {LOCALES.map((l) => (
+                    <button
+                      key={l.code}
+                      onClick={() => {
+                        setLocale(l.code);
+                        setLangOpen(false);
+                      }}
+                      className="flex w-full items-center justify-between px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      <span className="flex items-center gap-2">
+                        <span>{l.flag}</span>
+                        <span>{l.nativeLabel}</span>
+                      </span>
+                      {locale === l.code && <Check size={16} className="text-gelato-500" />}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
 
           <div className="relative">
             <button
@@ -90,11 +124,11 @@ export default function Header({ showSearchPill = true }) {
                         <p className="text-xs text-gray-500">{user.email}</p>
                       </div>
                       <div className="my-1 h-px bg-gray-100" />
-                      <MenuLink href="/reservations" label="여행 / 예약 내역" onClick={() => setOpen(false)} />
-                      <MenuLink href="/messages" label="메시지" onClick={() => setOpen(false)} />
-                      <MenuLink href="/wishlist" label="위시리스트" onClick={() => setOpen(false)} />
+                      <MenuLink href="/reservations" label={t("여행 / 예약 내역")} onClick={() => setOpen(false)} />
+                      <MenuLink href="/messages" label={t("메시지")} onClick={() => setOpen(false)} />
+                      <MenuLink href="/wishlist" label={t("위시리스트")} onClick={() => setOpen(false)} />
                       <div className="my-1 h-px bg-gray-100" />
-                      <MenuLink href="/host" label="숙소를 등록하세요" onClick={() => setOpen(false)} />
+                      <MenuLink href="/host" label={t("숙소를 등록하세요")} onClick={() => setOpen(false)} />
                       <button
                         onClick={() => {
                           logout();
@@ -103,16 +137,16 @@ export default function Header({ showSearchPill = true }) {
                         }}
                         className="block w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50"
                       >
-                        로그아웃
+                        {t("로그아웃")}
                       </button>
                     </>
                   ) : (
                     <>
-                      <MenuLink href="/signup" label="회원가입" bold onClick={() => setOpen(false)} />
-                      <MenuLink href="/login" label="로그인" onClick={() => setOpen(false)} />
+                      <MenuLink href="/signup" label={t("회원가입")} bold onClick={() => setOpen(false)} />
+                      <MenuLink href="/login" label={t("로그인")} onClick={() => setOpen(false)} />
                       <div className="my-1 h-px bg-gray-100" />
-                      <MenuLink href="/host" label="숙소를 등록하세요" onClick={() => setOpen(false)} />
-                      <MenuLink href="/help" label="고객센터" onClick={() => setOpen(false)} />
+                      <MenuLink href="/host" label={t("숙소를 등록하세요")} onClick={() => setOpen(false)} />
+                      <MenuLink href="/help" label={t("고객센터")} onClick={() => setOpen(false)} />
                     </>
                   )}
                 </div>

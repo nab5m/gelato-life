@@ -2,8 +2,10 @@
 
 import { categories } from "@/data/listings";
 import { SlidersHorizontal } from "lucide-react";
+import { useT } from "@/context/LocaleContext";
 
 export default function CategoryBar({ active, onChange }) {
+  const t = useT();
   return (
     <div className="flex items-center gap-4">
       <div className="no-scrollbar flex flex-1 items-center gap-7 overflow-x-auto py-3">
@@ -20,14 +22,14 @@ export default function CategoryBar({ active, onChange }) {
               }`}
             >
               <span className="text-2xl">{c.emoji}</span>
-              {c.label}
+              {t(c.label)}
             </button>
           );
         })}
       </div>
       <button className="hidden shrink-0 items-center gap-2 rounded-xl border border-gray-300 px-4 py-2.5 text-xs font-semibold text-gray-800 transition hover:border-gray-800 sm:flex">
         <SlidersHorizontal size={16} />
-        필터
+        {t("필터")}
       </button>
     </div>
   );

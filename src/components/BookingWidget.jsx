@@ -2,16 +2,24 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Minus, Plus } from "lucide-react";
+import { Minus, Plus, MessageCircle } from "lucide-react";
 import { krw } from "@/lib/format";
 import { computeContractPrice } from "@/lib/partner/contractPricing";
+import { useBlockedDates } from "@/lib/roomsClient";
+import { openChat } from "@/lib/chatClient";
+import { useAuth } from "@/context/AuthContext";
+import { useT } from "@/context/LocaleContext";
 import DateRangePicker from "@/components/DateRangePicker";
 
 export default function BookingWidget({ listing }) {
+  const t = useT();
   const router = useRouter();
+  const { user } = useAuth();
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [guests, setGuests] = useState(2);
+  const [contacting, setContacting] = useState(false);
+  const { blockedDates } = useBlockedDates(listing.id);
 
   // 실제 계약 금액과 동일한 플라트라이프 공식으로 견적 계산
   const price = useMemo(
@@ -39,12 +47,30 @@ export default function BookingWidget({ listing }) {
     router.push(`/checkout/${listing.id}?${params.toString()}`);
   };
 
+  // 호스트에게 문의: 채팅방을 생성/확보한 뒤 메시지 화면으로 이동.
+  const contactHost = async () => {
+    if (!user) {
+      const next = encodeURIComponent(`/rooms/${listing.id}`);
+      router.push(`/login?next=${next}`);
+      return;
+    }
+    setContacting(true);
+    try {
+      const chatId = await openChat(listing.id);
+      router.push(`/messages?chat=${chatId}`);
+    } catch (e) {
+      alert(e?.message || t("문의를 시작하지 못했어요."));
+    } finally {
+      setContacting(false);
+    }
+  };
+
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-card">
       <div className="flex items-end justify-between">
         <p>
           <span className="text-2xl font-bold">{krw(listing.price)}</span>
-          <span className="text-gray-600"> / 주</span>
+          <span className="text-gray-600"> {t("/ 주")}</span>
         </p>
       </div>
 
@@ -52,6 +78,8 @@ export default function BookingWidget({ listing }) {
         <DateRangePicker
           checkIn={checkIn}
           checkOut={checkOut}
+          blockedDates={blockedDates}
+          minDays={7}
           onChange={(ci, co) => {
             setCheckIn(ci);
             setCheckOut(co);
@@ -60,9 +88,9 @@ export default function BookingWidget({ listing }) {
         <div className="flex items-center justify-between rounded-xl border border-gray-300 p-3">
           <div>
             <span className="block text-[11px] font-bold uppercase text-gray-700">
-              인원
+              {t("인원")}
             </span>
-            <span className="text-sm text-gray-700">게스트 {guests}명</span>
+            <span className="text-sm text-gray-700">{t("게스트 {guests}명", { guests })}</span>
           </div>
           <div className="flex items-center gap-3">
             <button
@@ -89,29 +117,38 @@ export default function BookingWidget({ listing }) {
         disabled={!valid}
         className="btn-primary mt-4 w-full"
       >
-        {valid ? "예약하기" : "날짜를 선택하세요"}
+        {valid ? t("예약하기") : t("날짜를 선택하세요")}
+      </button>
+
+      <button
+        onClick={contactHost}
+        disabled={contacting}
+        className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-gray-300 py-2.5 text-sm font-semibold text-gray-700 transition hover:border-gray-800 disabled:opacity-50"
+      >
+        <MessageCircle size={16} />
+        {contacting ? t("문의 여는 중…") : t("호스트에게 문의하기")}
       </button>
 
       {valid && (
         <>
           <p className="mt-3 text-center text-sm text-gray-500">
-            아직 예약 확정 전이에요
+            {t("아직 예약 확정 전이에요")}
           </p>
           <div className="mt-4 space-y-3 text-sm text-gray-700">
-            <Row label={`임대료 (${price.days}일)`} value={krw(price.totalRentFee)} />
+            <Row label={t("임대료 ({days}일)", { days: price.days })} value={krw(price.totalRentFee)} />
             {price.discountedRentFee > 0 && (
-              <Row label="기간 할인" value={`- ${krw(price.discountedRentFee)}`} />
+              <Row label={t("기간 할인")} value={`- ${krw(price.discountedRentFee)}`} />
             )}
-            <Row label="관리비" value={krw(price.totalManagementFee)} />
-            <Row label="청소비" value={krw(price.cleaningFee)} />
-            <Row label="서비스 수수료" value={krw(price.commissionFee)} />
-            <Row label="보증금" value={krw(price.deposit)} />
+            <Row label={t("관리비")} value={krw(price.totalManagementFee)} />
+            <Row label={t("청소비")} value={krw(price.cleaningFee)} />
+            <Row label={t("서비스 수수료")} value={krw(price.commissionFee)} />
+            <Row label={t("보증금")} value={krw(price.deposit)} />
             <div className="border-t border-gray-200 pt-3">
-              <Row label="총 예상 금액" value={krw(price.totalPrice)} bold />
+              <Row label={t("총 예상 금액")} value={krw(price.totalPrice)} bold />
             </div>
           </div>
           <p className="mt-2 text-center text-xs text-gray-400">
-            최종 금액은 계약 시 플라트라이프 기준으로 확정됩니다.
+            {t("최종 금액은 계약 시 플라트라이프 기준으로 확정됩니다.")}
           </p>
         </>
       )}

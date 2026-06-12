@@ -3,11 +3,12 @@
 import { NextResponse } from "next/server";
 import { isPartnerConfigured } from "@/lib/partner/config";
 import { getRoom } from "@/lib/partner/rooms";
+import { withLocale } from "@/lib/partner/requestContext";
 import { getListing } from "@/data/listings";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(request, { params }) {
+async function handleGET(request, { params }) {
   const { id } = params;
 
   if (!isPartnerConfigured()) {
@@ -33,3 +34,5 @@ export async function GET(request, { params }) {
     );
   }
 }
+
+export const GET = withLocale(handleGET);

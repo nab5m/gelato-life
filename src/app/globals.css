@@ -90,3 +90,14 @@ body {
 .gl-cal .rdp-day_button:hover {
   background: #fff1f6;
 }
+/* 예약 마감일(blocked date): 회색 배경 + 취소선으로 선택 불가 표시 */
+.gl-cal .rdp-blocked .rdp-day_button {
+  background: #e5e7eb;
+  color: #9ca3af;
+  border-radius: 9999px;
+  text-decoration: line-through;
+  cursor: not-allowed;
+}
+.gl-cal .rdp-blocked .rdp-day_button:hover {
+  background: #e5e7eb;
+}

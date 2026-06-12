@@ -12,6 +12,7 @@ import GoogleMap from "@/components/GoogleMap";
 import { krw, formatDateLong } from "@/lib/format";
 import { useReservation, cancelReservation, completeReservation } from "@/lib/contractsClient";
 import { statusLabel, statusTone } from "@/lib/partner/mapContract";
+import { useT } from "@/context/LocaleContext";
 
 const TONE = {
   mint: "bg-mint-100 text-mint-700",
@@ -46,6 +47,7 @@ const INACTIVE = new Set([
 ]);
 
 function DetailInner() {
+  const t = useT();
   const { id } = useParams();
   const sp = useSearchParams();
   const isNew = sp.get("new") === "1";
@@ -60,14 +62,14 @@ function DetailInner() {
   const r = res || reservation;
 
   if (loading && !res) {
-    return <div className="p-20 text-center text-gray-400">불러오는 중…</div>;
+    return <div className="p-20 text-center text-gray-400">{t("불러오는 중…")}</div>;
   }
   if (error || !r) {
     return (
       <div className="p-20 text-center">
-        <p className="text-gray-700">예약을 찾을 수 없어요.</p>
+        <p className="text-gray-700">{t("예약을 찾을 수 없어요.")}</p>
         <Link href="/reservations" className="mt-2 inline-block font-semibold text-gelato-600 underline">
-          예약 내역으로
+          {t("예약 내역으로")}
         </Link>
       </div>
     );
@@ -87,7 +89,7 @@ function DetailInner() {
   };
 
   const onCancel = async () => {
-    if (!confirm("이 예약을 취소할까요?")) return;
+    if (!confirm(t("이 예약을 취소할까요?"))) return;
     setActionErr(null);
     setCanceling(true);
     try {
@@ -106,18 +108,18 @@ function DetailInner() {
         href="/reservations"
         className="mb-3 inline-flex items-center gap-1 text-sm font-semibold text-gray-700 hover:underline"
       >
-        <ChevronLeft size={16} /> 예약 내역
+        <ChevronLeft size={16} /> {t("예약 내역")}
       </Link>
 
       {isNew && !INACTIVE.has(r.status) && (
         <div className="mb-6 flex items-center gap-3 rounded-2xl bg-gradient-to-r from-mint-50 to-gelato-50 p-5 animate-fade-in">
           <CheckCircle2 className="shrink-0 text-mint-500" size={32} />
           <div>
-            <p className="text-lg font-bold text-gray-900">예약 신청이 접수되었어요! 🍦</p>
+            <p className="text-lg font-bold text-gray-900">{t("예약 신청이 접수되었어요! 🍦")}</p>
             <p className="text-sm text-gray-600">
               {r.status === "APPROVED"
-                ? "자동 승인되었습니다. 결제 안내를 기다려주세요."
-                : "호스트 승인 후 결제 안내를 받게 됩니다."}
+                ? t("자동 승인되었습니다. 결제 안내를 기다려주세요.")
+                : t("호스트 승인 후 결제 안내를 받게 됩니다.")}
             </p>
           </div>
         </div>
@@ -125,10 +127,10 @@ function DetailInner() {
 
       <div className="overflow-hidden rounded-3xl border border-gray-200 shadow-soft">
         {r.roomThumb ? (
-          <img src={r.roomThumb} alt={r.roomTitle || "방"} className="h-56 w-full object-cover md:h-72" />
+          <img src={r.roomThumb} alt={r.roomTitle || t("방")} className="h-56 w-full object-cover md:h-72" />
         ) : (
           <div className="flex h-56 w-full items-center justify-center bg-gray-100 text-gray-400 md:h-72">
-            등록된 이미지가 없습니다
+            {t("등록된 이미지가 없습니다")}
           </div>
         )}
         <div className="p-6">
@@ -137,46 +139,46 @@ function DetailInner() {
               TONE[statusTone(r.status)] || TONE.gray
             }`}
           >
-            {statusLabel(r.status)}
+            {t(statusLabel(r.status))}
           </span>
           <h1 className="mt-2 text-2xl font-bold text-gray-900">
-            {r.roomTitle || "이름 없는 숙소"}
+            {r.roomTitle || t("이름 없는 숙소")}
           </h1>
           <p className="mt-1 flex items-center gap-1 text-gray-600">
-            <MapPin size={15} /> {r.roomCity || "위치 정보 없음"}
+            <MapPin size={15} /> {r.roomCity || t("위치 정보 없음")}
           </p>
-          <p className="mt-4 text-xs text-gray-400">계약번호 {r.externalId}</p>
+          <p className="mt-4 text-xs text-gray-400">{t("계약번호")} {r.externalId}</p>
 
           {/* 정보 그리드 */}
           <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Info icon={Calendar} title="시작일" value={formatDateLong(r.startAt)} />
-            <Info icon={Calendar} title="종료일" value={formatDateLong(r.endAt)} />
+            <Info icon={Calendar} title={t("시작일")} value={formatDateLong(r.startAt)} />
+            <Info icon={Calendar} title={t("종료일")} value={formatDateLong(r.endAt)} />
           </div>
 
           {/* 입주자 */}
           <div className="mt-6 rounded-2xl bg-gray-50 p-4">
             <p className="flex items-center gap-1.5 text-xs font-semibold text-gray-500">
-              <User size={14} /> 입주자
+              <User size={14} /> {t("입주자")}
             </p>
             <p className="mt-1 font-semibold text-gray-900">{r.guestName || "-"}</p>
             <p className="text-sm text-gray-500">
-              {[r.guestEmail, r.guestPhone].filter(Boolean).join(" · ") || "연락처 없음"}
+              {[r.guestEmail, r.guestPhone].filter(Boolean).join(" · ") || t("연락처 없음")}
             </p>
           </div>
 
           {/* 결제 요약 */}
           <div className="mt-6">
-            <h3 className="mb-3 font-bold">금액 정보</h3>
+            <h3 className="mb-3 font-bold">{t("금액 정보")}</h3>
             <div className="space-y-2 text-sm text-gray-700">
-              <Row label="총 임대료" value={krw(r.totalRentFee)} />
+              <Row label={t("총 임대료")} value={krw(r.totalRentFee)} />
               {r.discountedRentFee > 0 && (
-                <Row label="기간 할인" value={`- ${krw(r.discountedRentFee)}`} />
+                <Row label={t("기간 할인")} value={`- ${krw(r.discountedRentFee)}`} />
               )}
-              <Row label="총 관리비" value={krw(r.totalManagementFee)} />
-              <Row label="청소비" value={krw(r.cleaningFee)} />
-              <Row label="보증금" value={krw(r.deposit)} />
+              <Row label={t("총 관리비")} value={krw(r.totalManagementFee)} />
+              <Row label={t("청소비")} value={krw(r.cleaningFee)} />
+              <Row label={t("보증금")} value={krw(r.deposit)} />
               <div className="border-t border-gray-200 pt-2">
-                <Row label="총 금액" value={krw(r.totalPrice)} bold />
+                <Row label={t("총 금액")} value={krw(r.totalPrice)} bold />
               </div>
             </div>
           </div>
@@ -192,7 +194,7 @@ function DetailInner() {
             </div>
           ) : (
             <div className="mt-6 flex h-40 items-center justify-center gap-2 rounded-2xl bg-gray-50 text-sm text-gray-400">
-              위치 정보가 없어요
+              {t("위치 정보가 없어요")}
             </div>
           )}
 
@@ -208,7 +210,7 @@ function DetailInner() {
                 disabled={completing || canceling}
                 className="btn-primary w-full disabled:opacity-50"
               >
-                {completing ? "결제 처리 중…" : "결제 완료"}
+                {completing ? t("결제 처리 중…") : t("결제 완료")}
               </button>
             )}
             {CANCELABLE.has(r.status) && (
@@ -217,7 +219,7 @@ function DetailInner() {
                 disabled={canceling || completing}
                 className="w-full rounded-xl border border-gelato-200 px-5 py-3 text-sm font-semibold text-gelato-600 transition hover:bg-gelato-50 disabled:opacity-50"
               >
-                {canceling ? "취소 처리 중…" : "예약 취소"}
+                {canceling ? t("취소 처리 중…") : t("예약 취소")}
               </button>
             )}
           </div>
@@ -228,6 +230,7 @@ function DetailInner() {
 }
 
 function Info({ icon: Icon, title, value }) {
+  const t = useT();
   return (
     <div className="rounded-2xl border border-gray-200 p-4">
       <p className="flex items-center gap-1.5 text-xs font-semibold text-gray-500">
@@ -239,6 +242,7 @@ function Info({ icon: Icon, title, value }) {
 }
 
 function Row({ label, value, bold }) {
+  const t = useT();
   return (
     <div className={`flex items-center justify-between ${bold ? "font-bold text-gray-900" : ""}`}>
       <span>{label}</span>
@@ -248,10 +252,11 @@ function Row({ label, value, bold }) {
 }
 
 export default function ReservationDetailPage() {
+  const t = useT();
   return (
     <div className="min-h-screen bg-white">
       <Header showSearchPill={false} />
-      <Suspense fallback={<div className="p-20 text-center text-gray-400">불러오는 중…</div>}>
+      <Suspense fallback={<div className="p-20 text-center text-gray-400">{t("불러오는 중…")}</div>}>
         <DetailInner />
       </Suspense>
       <Footer />

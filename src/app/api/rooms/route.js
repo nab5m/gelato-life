@@ -4,6 +4,7 @@
 import { NextResponse } from "next/server";
 import { isPartnerConfigured } from "@/lib/partner/config";
 import { listRoomsPage, DEFAULT_PAGE_SIZE } from "@/lib/partner/rooms";
+import { withLocale } from "@/lib/partner/requestContext";
 import { listings as mockListings } from "@/data/listings";
 
 export const dynamic = "force-dynamic";
@@ -36,7 +37,7 @@ function applyMock(items, { q, category, minPrice, maxPrice, sort }) {
   return result;
 }
 
-export async function GET(request) {
+async function handleGET(request) {
   const sp = request.nextUrl.searchParams;
   const q = sp.get("q") || sp.get("searchText") || "";
   const category = sp.get("category") || "all";
@@ -110,3 +111,5 @@ export async function GET(request) {
     );
   }
 }
+
+export const GET = withLocale(handleGET);

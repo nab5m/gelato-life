@@ -1,5 +1,6 @@
 // 파트너 오픈 API 호출 클라이언트 (서버 전용)
 import { partnerConfig } from "./config";
+import { getPartnerAcceptLanguage } from "./requestContext";
 
 // 공통 요청 함수.
 //  path:   "/open/v1/contract" 처럼 슬래시로 시작
@@ -23,7 +24,8 @@ export async function partnerRequest(path, { params = {}, method = "GET", body }
   const headers = {
     Authorization: `Basic ${basic}`,
     Accept: "application/json",
-    "Accept-Language": "ko-KR",
+    // 요청 컨텍스트(들어온 Accept-Language)를 그대로 파트너 API 로 전달. 없으면 ko-KR.
+    "Accept-Language": getPartnerAcceptLanguage(),
   };
   const init = { method, headers, cache: "no-store" };
   if (body !== undefined && method !== "GET") {

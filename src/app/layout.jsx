@@ -1,5 +1,7 @@
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
+import { FavoritesProvider } from "@/context/FavoritesContext";
+import { LocaleProvider } from "@/context/LocaleContext";
 
 export const metadata = {
   title: "젤라또 라이프 — 어디서든 달콤한 머무름",
@@ -11,7 +13,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="ko">
       <body className="font-sans antialiased">
-        <AuthProvider>{children}</AuthProvider>
+        <LocaleProvider>
+          <AuthProvider>
+            <FavoritesProvider>{children}</FavoritesProvider>
+          </AuthProvider>
+        </LocaleProvider>
       </body>
     </html>
   );

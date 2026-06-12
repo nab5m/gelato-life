@@ -5,8 +5,10 @@ import Footer from "@/components/Footer";
 import SearchBar from "@/components/SearchBar";
 import ListingCard from "@/components/ListingCard";
 import { useRooms, useInfiniteScroll } from "@/lib/roomsClient";
+import { useT } from "@/context/LocaleContext";
 
 export default function HomePage() {
+  const t = useT();
   const { rooms: filtered, loading, loadingMore, error, hasMore, loadMore } =
     useRooms();
   const sentinelRef = useInfiniteScroll(loadMore, hasMore && !loading && !error);
@@ -21,17 +23,17 @@ export default function HomePage() {
         <div className="pointer-events-none absolute -bottom-20 left-0 h-72 w-72 rounded-full bg-mint-200/40 blur-3xl" />
         <div className="relative mx-auto max-w-5xl px-4 py-14 text-center md:py-20">
           <span className="inline-block rounded-full bg-white/70 px-4 py-1.5 text-sm font-semibold text-gelato-600 shadow-soft">
-            🍦 어디서든 달콤한 머무름
+            🍦 {t("어디서든 달콤한 머무름")}
           </span>
           <h1 className="mt-5 text-3xl font-extrabold leading-tight text-gray-900 md:text-5xl">
-            오늘은 어디서{" "}
+            {t("오늘은 어디서")}{" "}
             <span className="bg-gradient-to-r from-gelato-500 to-mint-500 bg-clip-text text-transparent">
-              달콤하게
+              {t("달콤하게")}
             </span>{" "}
-            쉬어볼까요?
+            {t("쉬어볼까요?")}
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-gray-600">
-            전 세계 200만 개의 숙소 중, 당신만의 한 스쿱을 찾아보세요.
+            {t("전 세계 200만 개의 숙소 중, 당신만의 한 스쿱을 찾아보세요.")}
           </p>
           <div className="mt-8">
             <SearchBar variant="hero" />
@@ -48,7 +50,7 @@ export default function HomePage() {
         </div>
 
         {loading && (
-          <p className="py-20 text-center text-gray-400">숙소를 불러오는 중…</p>
+          <p className="py-20 text-center text-gray-400">{t("숙소를 불러오는 중…")}</p>
         )}
 
         {/* 무한 스크롤 sentinel + 추가 로딩 표시 */}
@@ -56,20 +58,20 @@ export default function HomePage() {
           <>
             <div ref={sentinelRef} aria-hidden className="h-px w-full" />
             {loadingMore && (
-              <p className="py-8 text-center text-gray-400">더 불러오는 중…</p>
+              <p className="py-8 text-center text-gray-400">{t("더 불러오는 중…")}</p>
             )}
           </>
         )}
 
         {error && !loading && (
           <p className="py-20 text-center text-gray-500">
-            숙소를 불러오지 못했어요. 잠시 후 다시 시도해주세요.
+            {t("숙소를 불러오지 못했어요. 잠시 후 다시 시도해주세요.")}
           </p>
         )}
 
         {!loading && !error && filtered.length === 0 && (
           <p className="py-20 text-center text-gray-500">
-            등록된 숙소가 아직 없어요.
+            {t("등록된 숙소가 아직 없어요.")}
           </p>
         )}
       </main>

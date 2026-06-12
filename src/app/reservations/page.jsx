@@ -8,6 +8,7 @@ import { krw, formatDate } from "@/lib/format";
 import { useReservations } from "@/lib/contractsClient";
 import { statusLabel, statusTone } from "@/lib/partner/mapContract";
 import { useAuth } from "@/context/AuthContext";
+import { useT } from "@/context/LocaleContext";
 
 const TONE = {
   mint: "bg-mint-100 text-mint-700",
@@ -26,6 +27,7 @@ const ACTIVE_STATUSES = new Set([
 ]);
 
 export default function ReservationsPage() {
+  const t = useT();
   const { user, ready } = useAuth();
   const { items, loading, error } = useReservations();
 
@@ -38,13 +40,13 @@ export default function ReservationsPage() {
       <div className="min-h-screen bg-white">
         <Header />
         <main className="mx-auto max-w-4xl px-4 py-8 md:px-6">
-          <h1 className="text-3xl font-bold text-gray-900">여행</h1>
+          <h1 className="text-3xl font-bold text-gray-900">{t("여행")}</h1>
           <div className="mt-8 rounded-2xl border border-dashed border-gray-300 p-10 text-center">
             <p className="text-4xl">🔑</p>
-            <p className="mt-3 font-semibold text-gray-800">로그인이 필요해요</p>
-            <p className="mt-1 text-sm text-gray-500">로그인하면 내 예약 내역을 볼 수 있어요.</p>
+            <p className="mt-3 font-semibold text-gray-800">{t("로그인이 필요해요")}</p>
+            <p className="mt-1 text-sm text-gray-500">{t("로그인하면 내 예약 내역을 볼 수 있어요.")}</p>
             <Link href="/login" className="btn-primary mt-5 inline-block">
-              로그인
+              {t("로그인")}
             </Link>
           </div>
         </main>
@@ -57,17 +59,17 @@ export default function ReservationsPage() {
     <div className="min-h-screen bg-white">
       <Header />
       <main className="mx-auto max-w-4xl px-4 py-8 md:px-6">
-        <h1 className="text-3xl font-bold text-gray-900">여행</h1>
+        <h1 className="text-3xl font-bold text-gray-900">{t("여행")}</h1>
 
-        {(loading || !ready) && <p className="py-16 text-center text-gray-400">불러오는 중…</p>}
+        {(loading || !ready) && <p className="py-16 text-center text-gray-400">{t("불러오는 중…")}</p>}
         {error && !loading && (
-          <p className="py-16 text-center text-gray-500">예약을 불러오지 못했어요.</p>
+          <p className="py-16 text-center text-gray-500">{t("예약을 불러오지 못했어요.")}</p>
         )}
 
         {ready && !loading && !error && (
           <>
-            <Section title="진행 중인 예약" items={upcoming} empty="진행 중인 예약이 없어요." />
-            <Section title="지난/취소된 예약" items={past} empty="지난 예약 내역이 없어요." />
+            <Section title={t("진행 중인 예약")} items={upcoming} empty={t("진행 중인 예약이 없어요.")} />
+            <Section title={t("지난/취소된 예약")} items={past} empty={t("지난 예약 내역이 없어요.")} />
           </>
         )}
       </main>
@@ -77,6 +79,7 @@ export default function ReservationsPage() {
 }
 
 function Section({ title, items, empty }) {
+  const t = useT();
   return (
     <section className="mt-8">
       <h2 className="mb-4 text-xl font-bold text-gray-900">{title}</h2>
@@ -84,7 +87,7 @@ function Section({ title, items, empty }) {
         <div className="rounded-2xl border border-dashed border-gray-300 p-8 text-center text-sm text-gray-500">
           {empty}{" "}
           <Link href="/search" className="font-semibold text-gelato-600 underline">
-            숙소 둘러보기
+            {t("숙소 둘러보기")}
           </Link>
         </div>
       ) : (
@@ -98,12 +101,12 @@ function Section({ title, items, empty }) {
               {r.roomThumb ? (
                 <img
                   src={r.roomThumb}
-                  alt={r.roomTitle || "방"}
+                  alt={r.roomTitle || t("방")}
                   className="h-24 w-32 shrink-0 rounded-xl object-cover"
                 />
               ) : (
                 <div className="flex h-24 w-32 shrink-0 items-center justify-center rounded-xl bg-gray-100 text-xs text-gray-400">
-                  이미지 없음
+                  {t("이미지 없음")}
                 </div>
               )}
               <div className="min-w-0 flex-1">
@@ -113,14 +116,14 @@ function Section({ title, items, empty }) {
                       TONE[statusTone(r.status)] || TONE.gray
                     }`}
                   >
-                    {statusLabel(r.status)}
+                    {t(statusLabel(r.status))}
                   </span>
                   <span className="truncate text-xs text-gray-400">{r.externalId}</span>
                 </div>
                 <p className="mt-1 truncate font-semibold text-gray-900">
-                  {r.roomTitle || "이름 없는 숙소"}
+                  {r.roomTitle || t("이름 없는 숙소")}
                 </p>
-                <p className="truncate text-sm text-gray-500">{r.roomCity || "위치 정보 없음"}</p>
+                <p className="truncate text-sm text-gray-500">{r.roomCity || t("위치 정보 없음")}</p>
                 <p className="mt-1 text-sm text-gray-700">
                   {formatDate(r.startAt)} – {formatDate(r.endAt)} · {krw(r.totalPrice)}
                 </p>

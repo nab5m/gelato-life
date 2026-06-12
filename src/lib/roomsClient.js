@@ -2,6 +2,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { apiFetch } from "./apiFetch";
 
 const DEFAULT_SIZE = 20;
 
@@ -34,17 +35,25 @@ export async function fetchRoomsPage({
   }
   sp.set("page", String(page));
   sp.set("size", String(size));
-  const res = await fetch(`/api/rooms?${sp.toString()}`);
+  const res = await apiFetch(`/api/rooms?${sp.toString()}`);
   if (!res.ok) throw new Error(`방 목록 조회 실패 (${res.status})`);
   return res.json();
 }
 
 export async function fetchRoom(id) {
-  const res = await fetch(`/api/rooms/${id}`);
+  const res = await apiFetch(`/api/rooms/${id}`);
   if (res.status === 404) return null;
   if (!res.ok) throw new Error(`방 상세 조회 실패 (${res.status})`);
   const json = await res.json();
   return json.room || null;
+}
+
+// 방의 예약 마감일(blocked date) 목록(yyyy-MM-dd[]) 조회. 실패 시 빈 배열.
+export async function fetchBlockedDates(id) {
+  const res = await apiFetch(`/api/rooms/${id}/blocked-dates`);
+  if (!res.ok) return [];
+  const json = await res.json();
+  return Array.isArray(json.blockedDates) ? json.blockedDates : [];
 }
 
 // 목록 hook (무한 스크롤): { rooms, loading, loadingMore, error, hasMore, loadMore, totalItems }
@@ -170,4 +179,22 @@ export function useRoom(id) {
   }, [id]);
 
   return { room, loading, error };
+}
+
+// 방의 예약 마감일 hook: { blockedDates } (yyyy-MM-dd[])
+export function useBlockedDates(id) {
+  const [blockedDates, setBlockedDates] = useState([]);
+
+  useEffect(() => {
+    if (!id) return;
+    let alive = true;
+    fetchBlockedDates(id)
+      .then((d) => alive && setBlockedDates(d))
+      .catch(() => alive && setBlockedDates([]));
+    return () => {
+      alive = false;
+    };
+  }, [id]);
+
+  return { blockedDates };
 }

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search, Minus, Plus } from "lucide-react";
 import DateRangePicker from "@/components/DateRangePicker";
+import { useT } from "@/context/LocaleContext";
 
 export default function SearchBar({
   variant = "hero",
@@ -12,6 +13,7 @@ export default function SearchBar({
   initialCheckOut = "",
   initialGuests = 1,
 }) {
+  const t = useT();
   const router = useRouter();
   const [where, setWhere] = useState(initialWhere);
   const [checkIn, setCheckIn] = useState(initialCheckIn);
@@ -40,12 +42,12 @@ export default function SearchBar({
         {/* 여행지 */}
         <div className="flex-1 rounded-2xl px-5 py-2.5 transition hover:bg-gray-50 md:rounded-full">
           <label className="block text-xs font-semibold text-gray-800">
-            여행지
+            {t("여행지")}
           </label>
           <input
             value={where}
             onChange={(e) => setWhere(e.target.value)}
-            placeholder="어디로 떠나볼까요?"
+            placeholder={t("어디로 떠나볼까요?")}
             className="w-full bg-transparent text-sm outline-none placeholder:text-gray-400"
           />
         </div>
@@ -54,7 +56,7 @@ export default function SearchBar({
         {/* 날짜 */}
         <div className="flex-1 rounded-2xl px-5 py-2 transition hover:bg-gray-50 md:rounded-full">
           <label className="block text-xs font-semibold text-gray-800">
-            날짜
+            {t("날짜")}
           </label>
           <DateRangePicker
             checkIn={checkIn}
@@ -65,6 +67,7 @@ export default function SearchBar({
             }}
             showIcon={false}
             triggerClassName="w-full bg-transparent text-left text-sm text-gray-600 outline-none"
+            minDays={7}
           />
         </div>
         <div className="hidden h-8 w-px bg-gray-200 md:block" />
@@ -77,15 +80,15 @@ export default function SearchBar({
             className="flex-1 rounded-2xl px-3 py-2.5 text-left transition hover:bg-gray-50 md:rounded-full"
           >
             <span className="block text-xs font-semibold text-gray-800">
-              여행자
+              {t("여행자")}
             </span>
-            <span className="text-sm text-gray-600">게스트 {guests}명</span>
+            <span className="text-sm text-gray-600">{t("게스트 {guests}명", { guests })}</span>
           </button>
 
           <button
             type="submit"
             className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-gelato-500 to-gelato-600 text-white shadow-soft transition hover:opacity-95"
-            aria-label="검색"
+            aria-label={t("검색")}
           >
             <Search size={20} />
           </button>
@@ -94,8 +97,8 @@ export default function SearchBar({
             <div className="absolute right-0 top-16 z-20 w-64 rounded-2xl border border-gray-200 bg-white p-4 shadow-card animate-fade-in">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-semibold">게스트</p>
-                  <p className="text-xs text-gray-500">인원을 선택하세요</p>
+                  <p className="text-sm font-semibold">{t("게스트")}</p>
+                  <p className="text-xs text-gray-500">{t("인원을 선택하세요")}</p>
                 </div>
                 <div className="flex items-center gap-3">
                   <button
@@ -123,7 +126,7 @@ export default function SearchBar({
                 onClick={() => setOpenGuests(false)}
                 className="mt-4 w-full rounded-xl bg-gray-900 py-2 text-sm font-semibold text-white"
               >
-                완료
+                {t("완료")}
               </button>
             </div>
           )}
